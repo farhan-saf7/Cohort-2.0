@@ -11,7 +11,7 @@ function App() {
   ])
 
   function fetchNotes() {
-    axios.get('http://localhost:3000/api/notes')
+    axios.get('https://cohort-2-0-2-8cbb.onrender.com/')
       .then((res) => {
         setNotes(res.data.notes)
       })
@@ -24,7 +24,7 @@ function App() {
   function handleSubmit(e) {
     e.preventDefault()
     const { title, description } = e.target.elements
-    axios.post('http://localhost:3000/api/notes', {
+    axios.post('https://cohort-2-0-2-8cbb.onrender.com/', {
       title: title.value,
       description: description.value
     })
@@ -36,7 +36,7 @@ function App() {
   }
 
   function handleDeleteNote(noteId) {
-    axios.delete('http://localhost:3000/api/notes/' + noteId)
+    axios.delete('https://cohort-2-0-2-8cbb.onrender.com/' + noteId)
       .then(res => {
         console.log(res.data)
         fetchNotes()
@@ -46,7 +46,7 @@ function App() {
 
   function handleUpdateNote(noteId){
     const newDescription = prompt("Enter new description")
-    axios.patch('http://localhost:3000/api/notes/' + noteId,{
+    axios.patch('https://cohort-2-0-2-8cbb.onrender.com/' + noteId,{
       description: newDescription
     })
     .then(res=>{
