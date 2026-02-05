@@ -28,3 +28,27 @@ html{
   max-width: 20rem;
   color: aliceblue;
 }
+
+.note-create-form{
+  display: flex;
+  gap: 1rem;
+  padding-block: 1rem;
+  padding-inline: 3rem;
+}
+
+.note-create-form input,
+.note-create-form button {
+  padding: 0.6rem 1rem;
+  border-radius: 0.4rem;
+  border: none;
+  outline: none;
+  background-color: white;
+  color: black;
+  font-size: 1rem;
+}
+
+.note-create-form button {
+  cursor: pointer;
+  background-color: #4caf50;
+  color: white;
+}
