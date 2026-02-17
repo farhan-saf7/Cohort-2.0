@@ -3,7 +3,7 @@ const crypto = require("crypto")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 
-async function registerController (req, res) {
+async function registerController(req, res) {
     const { username, email, password, bio, profileImage } = req.body
 
     /* const isUserExistsByEmail = await userModel.findOne({email})
@@ -43,7 +43,9 @@ async function registerController (req, res) {
     })
 
     const token = jwt.sign({
-        user_id: user._id
+        user_id: user._id,
+        username: user.username
+
     },
         process.env.JWT_SECRET,
         { expiresIn: "1d" }
@@ -62,10 +64,10 @@ async function registerController (req, res) {
     })
 }
 
-async function loginController (req, res) {
+async function loginController(req, res) {
     const { username, email, password } = req.body
     const user = await userModel.findOne({
-        $or:[
+        $or: [
             {
                 username: username
             },
@@ -74,7 +76,7 @@ async function loginController (req, res) {
             }
         ]
     })
-    if(!user){
+    if (!user) {
         return res.status(404).json({
             message: "user not found"
         })
@@ -82,21 +84,21 @@ async function loginController (req, res) {
 
     const isPasswordValid = await bcrypt.compare(password, user.password)
 
-    if(!isPasswordValid){
+    if (!isPasswordValid) {
         return res.status(401).json({
             message: "password invalid"
         })
     }
     const token = jwt.sign(
-        {id: user._id},
+        { id: user._id, username: user.username },
         process.env.JWT_SECRET,
-        {expiresIn: "1d"}
+        { expiresIn: "1d" }
     )
-    res.cookie("token",token)
+    res.cookie("token", token)
 
     res.status(200).json({
         message: "user loggedIn sucessfully",
-        user:{
+        user: {
             username: user.username,
             email: user.email,
             bio: user.bio,
