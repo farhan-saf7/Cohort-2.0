@@ -23,15 +23,29 @@ async function followUserController(req, res) {
         })
     }
 
-    const isAlreadyFollowing = await followModel.findOne({
+    const isAlreadyRequested = await followModel.findOne({
         follower: followerUsername,
         followee: followeeUsername
     })
 
-    if (isAlreadyFollowing) {
+    if (isAlreadyRequested) {
+        if(isAlreadyRequested.status === "accepted"){
+            return res.status(200).json({
+                message: `you are already following ${followeeUsername}`,
+                follow: isAlreadyRequested
+            })
+        }
+        if(isAlreadyRequested.status === "pending"){
+            return res.status(200).json({
+                message: `follow request already sent to ${followeeUsername}`,
+                follow: isAlreadyRequested
+            })
+        }
+        isAlreadyRequested.status = "pending"
+        await isAlreadyRequested.save()
         return res.status(200).json({
-            message: `you are already following ${followeeUsername}`,
-            follow: isAlreadyFollowing
+            message: `follow request sent again to ${followeeUsername}`,
+            follow: isAlreadyRequested
         })
     }
 
@@ -41,10 +55,41 @@ async function followUserController(req, res) {
     })
 
     res.status(201).json({
-        message: `you are now following ${followeeUsername}`,
+        message: `follow request sent to ${followeeUsername}`,
         follow: followRecord
     })
 
+}
+
+async function handlerFollowRequest(req,res){
+    const followeeUsername = req.user.username
+    const {followerUsername,action} = req.body
+
+    if(!["accept","reject"].includes(action)){
+        return res.status(400).json({
+            message: "invalid action. use 'accept' or 'reject'"
+        })
+    }
+
+    const followRequest = await followModel.findOne({
+        follower: followerUsername,
+        followee: followeeUsername,
+        status: "pending"
+    })
+
+    if(!followRequest){
+        return res.status(404).json({
+            message: "no pending follow request found"
+        })
+    }
+
+    followRequest.status = action === "accept" ? "accepted" : "rejected"
+    await followRequest.save()
+
+    res.status(200).json({
+        message: `you have ${action}ed follow request from ${followerUsername}`,
+        follow: followRequest
+    })
 }
 
 async function unfollowUserController(req, res) {
@@ -62,7 +107,7 @@ async function unfollowUserController(req, res) {
         })
     }
 
-    await followModel.findByIdAndDelete(isUserFollowing)
+    await followModel.findOneAndDelete(isUserFollowing)
 
     return res.status(200).json({
         message: `you have unfollowed ${followeeUsername}`
@@ -70,4 +115,4 @@ async function unfollowUserController(req, res) {
 
 }
 
-module.exports = { followUserController, unfollowUserController }
+module.exports = { followUserController, unfollowUserController, handlerFollowRequest }
