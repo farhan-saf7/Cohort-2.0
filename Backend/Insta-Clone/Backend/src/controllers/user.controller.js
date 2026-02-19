@@ -73,8 +73,7 @@ async function handlerFollowRequest(req,res){
 
     const followRequest = await followModel.findOne({
         follower: followerUsername,
-        followee: followeeUsername,
-        status: "pending"
+        followee: followeeUsername
     })
 
     if(!followRequest){
@@ -83,13 +82,21 @@ async function handlerFollowRequest(req,res){
         })
     }
 
-    followRequest.status = action === "accept" ? "accepted" : "rejected"
-    await followRequest.save()
+    if(followRequest.status === "accepted"){
+        return res.status(200).json({
+            message: "you already accepted the request",
+        })
+    }
 
-    res.status(200).json({
-        message: `you have ${action}ed follow request from ${followerUsername}`,
-        follow: followRequest
-    })
+    if(followRequest.status === "pending"){
+        followRequest.status = action === "accept" ? "accepted" : "rejected"
+        await followRequest.save()
+    
+        res.status(200).json({
+            message: `you have ${action}ed follow request from ${followerUsername}`,
+            follow: followRequest
+        })
+    }
 }
 
 async function unfollowUserController(req, res) {
