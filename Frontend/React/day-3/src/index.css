@@ -1,0 +1,89 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,body{
+  background-color: white;
+  height: 100vh;
+  width: 100vw;
+}
+
+.main{
+  padding: 1rem;
+}
+
+.nav{
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.nav .link{
+  display: flex;
+  gap: 50px;
+}
+
+.nav .link a{
+  text-decoration: none;
+  color: black;
+}
+
+.nav button{
+  border-radius: 999px;
+  background-color: black;
+  color: aliceblue;
+  padding: 8px 22px;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.hero{
+  color: aliceblue;
+  width: 100%;
+  min-height: 50vh;
+  padding: 1rem;
+  margin: .5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-image: url("https://tse2.mm.bing.net/th/id/OIP.KRr0W0qiwlmZbku7r60HdwHaD4?pid=Api&P=0&h=180");
+  background-size: cover;
+  background-position: center;
+}
+.hero .center{
+  display: flex;
+  flex-direction: column;
+  justify-content:center ;
+  align-items: center;
+  gap: 1rem;
+  padding: 50px;
+}
+
+.hero .center button{
+  background-color: black;
+  color: aliceblue;
+  padding: 10px 26px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+}
+
+.hero .bottom{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.hero .bottom .right{
+  display: flex;
+  gap: 1rem;
+}
+
+.hero .bottom .right button{
+  background-color: transparent;
+  border: none;
+  color: aliceblue;
+}
