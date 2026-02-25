@@ -122,8 +122,35 @@ async function unlikePostController(req,res){
         return res.status(200).json({
             message: "post unliked"
         })
-    }
-    
+    }    
 }
 
-module.exports = { createPostController, getPostController, getPostDetailsController, likePostController, unlikePostController}
+async function getFeedController(req, res) {
+  try {
+    const posts = await postModel.find().populate("user").lean();
+
+    const feed = await Promise.all(
+      posts.map(async (post) => {
+        const isLiked = await likeModel.findOne({
+          user: req.user.username,
+          post: post._id,
+        });
+
+        return {
+          ...post,
+          isLiked: !!isLiked,
+        };
+      })
+    );
+
+    res.status(200).json({
+      message: "posts fetched successfully",
+      posts: feed,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+module.exports = { createPostController, getPostController, getPostDetailsController, likePostController, unlikePostController, getFeedController}
