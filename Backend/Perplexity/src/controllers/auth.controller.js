@@ -1,37 +1,46 @@
-import { UserModel } from "../models/user.model.js";
-import { validationResult } from "express-validator";
+import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
-import { sendMail } from "../services/mail.service.js";
+import { sendEmail } from "../services/mail.service.js";
 
-export const registerUser = async (req, res) => {
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
 
-        const { username, email, password } = req.body;
+export async function register(req, res) {
 
-        const isUser = await UserModel.findOne({ email });
-        if (isUser) {
-            return res.status(400).json({ message: "User already exists" });
-        }
+    const { username, email, password } = req.body;
 
-        const user = await UserModel.create({
-            username,
-            email,
-            password
-        });
+    const isUserAlreadyExists = await userModel.findOne({
+        $or: [ { email }, { username } ]
+    })
 
-        await sendMail(
-            email,
-            "Welcome to Perplexity",
-            `<p>Thank you for registering</p>`,
-            "Thank you for registering"
-        );
-
-        res.status(201).json(user);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    if (isUserAlreadyExists) {
+        return res.status(400).json({
+            message: "User with this email or username already exists",
+            success: false,
+            err: "User already exists"
+        })
     }
+
+    const user = await userModel.create({ username, email, password })
+
+    await sendEmail({
+        to: email,
+        subject: "Welcome to Perplexity!",
+        html: `
+                <p>Hi ${username},</p>
+                <p>Thank you for registering at <strong>Perplexity</strong>. We're excited to have you on board!</p>
+                <p>Best regards,<br>The Perplexity Team</p>
+        `
+    })
+
+    res.status(201).json({
+        message: "User registered successfully",
+        success: true,
+        user: {
+            id: user._id,
+            username: user.username,
+            email: user.email
+        }
+    });
+
+
+
 }
